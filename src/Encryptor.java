@@ -76,18 +76,19 @@ public class Encryptor
     public String encryptMessage(String message)
     {
         String encryptedMessage = "";
+        int chunkLength = numRows * numCols;
 
-        int numLetters = 0;
-        String chunk;
-        while (encryptedMessage.length() < message.length()) {
+        while (message.length() > 0) {
 
-            chunk = message.substring(numLetters, numLetters + numRows * numCols - 1);
+            if (chunkLength > message.length()) {
+                chunkLength = message.length();
+            }
 
-            fillBlock(chunk);
-            encryptBlock();
+            fillBlock(message);
 
             encryptedMessage += encryptBlock();
-            numLetters += chunk.length();
+
+            message = message.substring(chunkLength);
         }
 
         return encryptedMessage;
@@ -117,12 +118,45 @@ public class Encryptor
      */
     public String decryptMessage(String encryptedMessage)
     {
-        /* to be implemented in part (d) */
+        String decryptedMessage = "";
+        int chunkLength = numRows * numCols;
 
-        return ""; //stub value
+        while (encryptedMessage.length() > 0) {
+            String chunk = encryptedMessage.substring(0, chunkLength);
+            decryptedMessage += decryptBlock(chunk);
+            encryptedMessage = encryptedMessage.substring(chunkLength);
+        }
+
+        String finalCharacter = decryptedMessage.substring(decryptedMessage.length() - 1);
+
+        while (finalCharacter.equals("A")) {
+            decryptedMessage = decryptedMessage.substring(0, decryptedMessage.length() - 1);
+            finalCharacter = decryptedMessage.substring(decryptedMessage.length() - 1);
+        }
+
+        return decryptedMessage;
     }
 
-    public String decryptBlock(String message) {
-        return "";
+    public String decryptBlock(String message)
+    {
+        String[][] temp = new String[numRows][numCols];
+        int k = 0;
+
+        for (int col = 0; col < temp[0].length; col++) {
+            for (int row = 0; row < temp.length; row++) {
+                temp[row][col] = message.substring(k, k + 1);
+                k++;
+            }
+        }
+
+        String decryptedBlock = "";
+
+        for (String[] strArr : temp) {
+            for (String element : strArr) {
+                decryptedBlock += element;
+            }
+        }
+
+        return decryptedBlock;
     }
 }
